@@ -1,5 +1,12 @@
 use crate::constants::*;
-use crate::types::{Champion, Class, Origin};
+use crate::types::{
+    Champion, Class, Origin, amp_details, animasquad_details, bastion_details, boombots_details,
+    bruiser_details, cyberboss_details, cypher_details, divinicorp_details, dynamo_details,
+    executioner_details, exotech_details, godofthenet_details, goldenox_details, marksman_details,
+    nitro_details, overlord_details, rapidfire_details, slayer_details, soulkiller_details,
+    strategist_details, streetdemon_details, syndicate_details, techie_details, vanguard_details,
+    virus_details,
+};
 use std::collections::HashSet;
 
 mod champions;
@@ -135,6 +142,20 @@ impl Team {
         unique_origins.len()
     }
 
+    // Helper function to calculate threshold rewards for a trait
+    fn calculate_threshold_reward(&self, count: usize, thresholds: &[usize]) -> f64 {
+        let mut reward = 0.0;
+        for (index, &threshold) in thresholds.iter().enumerate() {
+            if count >= threshold {
+                // Progressive reward: higher stages (later indices) get more rewards
+                // Base reward is 1.0, each stage adds 0.5 more reward
+                let stage_reward = 1.0 + (index as f64 * 0.5);
+                reward += stage_reward;
+            }
+        }
+        reward
+    }
+
     // Calculate a fitness score for the team
     pub fn fitness(&self) -> f64 {
         let mut score = 0.0;
@@ -172,6 +193,51 @@ impl Team {
             self.origin(Origin::SYNCIDATE),
             self.origin(Origin::VIRUS),
         ];
+
+        // Get class thresholds
+        let class_thresholds = vec![
+            amp_details().thresholds,
+            bastion_details().thresholds,
+            bruiser_details().thresholds,
+            dynamo_details().thresholds,
+            executioner_details().thresholds,
+            marksman_details().thresholds,
+            rapidfire_details().thresholds,
+            slayer_details().thresholds,
+            strategist_details().thresholds,
+            techie_details().thresholds,
+            vanguard_details().thresholds,
+            overlord_details().thresholds,
+            soulkiller_details().thresholds,
+        ];
+
+        // Get origin thresholds
+        let origin_thresholds = vec![
+            animasquad_details().thresholds,
+            boombots_details().thresholds,
+            cyberboss_details().thresholds,
+            cypher_details().thresholds,
+            divinicorp_details().thresholds,
+            exotech_details().thresholds,
+            godofthenet_details().thresholds,
+            goldenox_details().thresholds,
+            nitro_details().thresholds,
+            overlord_details().thresholds,
+            soulkiller_details().thresholds,
+            streetdemon_details().thresholds,
+            syndicate_details().thresholds,
+            virus_details().thresholds,
+        ];
+
+        // Calculate threshold rewards for classes
+        for (count, thresholds) in class_counts.iter().zip(class_thresholds.iter()) {
+            score += self.calculate_threshold_reward(*count, thresholds) * CLASS_THRESHOLD_WEIGHT;
+        }
+
+        // Calculate threshold rewards for origins (1.5x multiplier)
+        for (count, thresholds) in origin_counts.iter().zip(origin_thresholds.iter()) {
+            score += self.calculate_threshold_reward(*count, thresholds) * ORIGIN_THRESHOLD_WEIGHT;
+        }
 
         // Reward for having multiple of the same trait (synergy)
         // Use a more balanced approach - reward synergies but not too heavily

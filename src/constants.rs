@@ -10,7 +10,11 @@ pub const ORIGIN_SYNERGY_WEIGHT: f64 = 8.0; // Much higher to prioritize origin 
 pub const UNIQUE_CLASS_WEIGHT: f64 = 1.0;
 pub const UNIQUE_ORIGIN_WEIGHT: f64 = 0.0; // Zero to completely discourage origin diversity
 pub const ACTIVE_TRAIT_WEIGHT: f64 = 0.0; // Zero to completely eliminate diversity rewards
-pub const ORIGIN_DIVERSITY_PENALTY: f64 = 7.0; // Penalty for having too many unique origins
+pub const ORIGIN_DIVERSITY_PENALTY: f64 = 6.5; // Penalty for having too many unique origins
+
+// Threshold Reward Weights
+pub const CLASS_THRESHOLD_WEIGHT: f64 = 6.0; // Base weight for reaching class thresholds
+pub const ORIGIN_THRESHOLD_WEIGHT: f64 = 7.5; // Base weight for reaching origin thresholds
 
 // Selection Parameters
 pub const ELITE_PERCENTAGE: f64 = 0.33; // 33% for elitism
